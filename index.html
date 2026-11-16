@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kriptográfiai Eszköztár</title>
+    <style>
+        :root {
+            --bg-color: #0f172a;
+            --card-bg: #1e293b;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --accent: #3b82f6;
+            --accent-hover: #2563eb;
+            --secondary: #10b981;
+            --secondary-hover: #059669;
+            --border: #334155;
+            --input-bg: #0f172a;
+            --error-bg: #7f1d1d;
+            --error-text: #fca5a5;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 2rem 1rem;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 750px;
+            background-color: var(--card-bg);
+            border-radius: 16px;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5), 0 8px 10px -6px rgba(0, 0, 0, 0.3);
+            border: 1px solid var(--border);
+            overflow: hidden;
+        }
+
+        header {
+            padding: 1.5rem 2rem;
+            border-bottom: 1px solid var(--border);
+            background: linear-gradient(to right, #1e293b, #0f172a);
+        }
+
+        header h1 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            letter-spacing: -0.025em;
+        }
+
+        header p {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            margin-top: 0.25rem;
+        }
+
+        .tabs {
+            display: flex;
+            border-bottom: 1px solid var(--border);
+            background-color: rgba(15, 23, 42, 0.4);
+            overflow-x: auto;
+        }
+
+        .tab-btn {
+            flex: 1;
+            padding: 1rem;
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            font-weight: 600;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border-bottom: 2px solid transparent;
+            white-space: nowrap;
+        }
+
+        .tab-btn:hover {
+            color: var(--text-main);
+            background-color: rgba(255, 255, 255, 0.03);
+        }
+
+        .tab-btn.active {
+            color: var(--accent);
+            border-bottom-color: var(--accent);
+            background-color: rgba(59, 130, 246, 0.08);
+        }
+
+        .content {
+            padding: 2rem;
+        }
+
+        .algo-panel {
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .algo-panel.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .form-group {
+            margin-bottom: 1.25rem;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+
+        @media (max-width: 600px) {
+            .form-row { grid-template-columns: 1fr; }
+        }
+
+        label {
+            display: block;
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: var(--text-muted);
+            margin-bottom: 0.5rem;
+        }
+
+        input[type="text"],
+        input[type="number"],
+        textarea {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            background-color: var(--input-bg);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            color: var(--text-main);
+            font-size: 0.95rem;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 80px;
+            font-family: 'Consolas', 'Courier New', monospace;
+        }
+
+        input:focus, textarea:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+        }
+
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-top: 1.75rem;
+            cursor: pointer;
+        }
+
+        .checkbox-group input {
+            width: 1.1rem;
+            height: 1.1rem;
+            accent-color: var(--accent);
+            cursor: pointer;
+        }
+
+        .checkbox-group label {
+            margin: 0;
+            color: var(--text-main);
+            cursor: pointer;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+
+        button.action-btn {
+            flex: 1;
+            padding: 0.85rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: background-color 0.2s, transform 0.1s;
+            color: white;
+        }
+
+        button.action-btn:active {
+            transform: scale(0.98);
+        }
+
+        .btn-encrypt {
+            background-color: var(--accent);
+        }
+
+        .btn-encrypt:hover {
+            background-color: var(--accent-hover);
+        }
+
+        .btn-decrypt {
+            background-color: var(--secondary);
+        }
+
+        .btn-decrypt:hover {
+            background-color: var(--secondary-hover);
+        }
+
+        .result-box {
+            margin-top: 2rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid var(--border);
+        }
+
+        .result-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.5rem;
+        }
+
+        .copy-btn {
+            background: var(--border);
+            color: var(--text-main);
+            border: none;
+            padding: 0.3rem 0.7rem;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .copy-btn:hover {
+            background: #475569;
+        }
+
+        #output {
+            background-color: #090d16;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 1rem;
+            min-height: 60px;
+            font-family: 'Consolas', 'Courier New', monospace;
+            font-size: 1.05rem;
+            word-break: break-all;
+            color: #38bdf8;
+        }
+
+        #output.error {
+            background-color: var(--error-bg);
+            border-color: #991b1b;
+            color: var(--error-text);
+            font-family: inherit;
+            font-size: 0.95rem;
+        }
+
+        .hint {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            margin-top: 0.3rem;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <h1>Kriptográfiai Algoritmusok</h1>
+        <p>Paraméterezhető titkosító és visszafejtő felület</p>
+    </header>
+
+    <div class="tabs">
+        <button class="tab-btn active" data-tab="caesar">Caesar</button>
+        <button class="tab-btn" data-tab="group">Csoportos Helyettesítés</button>
+        <button class="tab-btn" data-tab="vigenere">Vigenère</button>
+        <button class="tab-btn" data-tab="shannon">Shannon Keverő</button>
+    </div>
+
+    <div class="content">
+        <div class="form-group">
+            <label for="main-input">Bemeneti szöveg (üzenet)</label>
+            <textarea id="main-input" placeholder="Írd ide a titkosítandó vagy visszafejtendő szöveget...">HELLO_WORLD</textarea>
+        </div>
+
+        <!-- 1. CAESAR PANEL -->
+        <div id="panel-caesar" class="algo-panel active">
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="caesar-shift">Eltolás mértéke (Shift)</label>
+                    <input type="number" id="caesar-shift" value="3">
+                </div>
+                <div class="form-group">
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="caesar-underline" checked>
+                        <label for="caesar-underline">Alulvonás (_) használata az ABC-ben</label>
+                    </div>
+                </div>
+            </div>
+            <div class="btn-group">
+                <button class="action-btn btn-encrypt" id="btn-caesar-enc">Titkosítás</button>
+                <button class="action-btn btn-decrypt" id="btn-caesar-dec">Visszafejtés</button>
+            </div>
+        </div>
+
+        <!-- 2. CSOPORTOS HELYETTESÍTÉS PANEL -->
+        <div id="panel-group" class="algo-panel">
+            <div class="form-group">
+                <label for="group-matrix">Mátrix sorai (vesszővel elválasztott karakterek, soronként új sor)</label>
+                <textarea id="group-matrix" rows="3">A,B,C,D,E,F,G,H,I
+J,K,L,M,N,O,P,Q,R
+S,T,U,V,W,X,Y,Z,_</textarea>
+                <div class="hint">Alapértelmezett: 3 sor (A, B, C) × 9 oszlop (AA..CC) = 27 karakter.</div>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="group-rows">Sor címkék (vesszővel)</label>
+                    <input type="text" id="group-rows" value="A,B,C">
+                </div>
+                <div class="form-group">
+                    <label for="group-cols">Oszlop címkék (vesszővel, 2 karakteresek)</label>
+                    <input type="text" id="group-cols" value="AA,AB,AC,BA,BB,BC,CA,CB,CC">
+                </div>
+            </div>
+            <div class="btn-group">
+                <button class="action-btn btn-encrypt" id="btn-group-enc">Titkosítás</button>
+                <button class="action-btn btn-decrypt" id="btn-group-dec">Visszafejtés</button>
+            </div>
+        </div>
+
+        <!-- 3. VIGENERE PANEL -->
+        <div id="panel-vigenere" class="algo-panel">
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="vig-key">Kulcsszó (Key)</label>
+                    <input type="text" id="vig-key" value="TITOK">
+                </div>
+                <div class="form-group">
+                    <label for="vig-abc">ABC készlet</label>
+                    <input type="text" id="vig-abc" value="ABCDEFGHIJKLMNOPQRSTUVWXYZ_">
+                </div>
+            </div>
+            <div class="btn-group">
+                <button class="action-btn btn-encrypt" id="btn-vig-enc">Titkosítás</button>
+                <button class="action-btn btn-decrypt" id="btn-vig-dec">Visszafejtés</button>
+            </div>
+        </div>
+
+        <!-- 4. SHANNON KEVERŐ PANEL -->
+        <div id="panel-shannon" class="algo-panel">
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="shannon-pre">Elő-permutáció (vesszővel, 1-től indexelve)</label>
+                    <input type="text" id="shannon-pre" value="3,1,2">
+                </div>
+                <div class="form-group">
+                    <label for="shannon-after">Utó-permutáció (vesszővel, 1-től indexelve)</label>
+                    <input type="text" id="shannon-after" value="3,2,1">
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="shannon-shift">Eltolás (Shift)</label>
+                    <input type="number" id="shannon-shift" value="3">
+                </div>
+                <div class="form-group">
+                    <label for="shannon-cycles">Ciklusok száma (Cycles)</label>
+                    <input type="number" id="shannon-cycles" value="2" min="1">
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="shannon-spacer">Töltőkarakter (Spacer)</label>
+                    <input type="text" id="shannon-spacer" value="X" maxlength="1">
+                </div>
+                <div class="form-group">
+                    <label for="shannon-abc">ABC készlet</label>
+                    <input type="text" id="shannon-abc" value="ABCDEFGHIJKLMNOPQRSTUVWXYZ_">
+                </div>
+            </div>
+            <div class="btn-group">
+                <button class="action-btn btn-encrypt" id="btn-shannon-enc">Titkosítás futtatása</button>
+            </div>
+        </div>
+
+        <div class="result-box">
+            <div class="result-header">
+                <label>Eredmény</label>
+                <button class="copy-btn" id="btn-copy">Másolás</button>
+            </div>
+            <div id="output">Válassz műveletet a futtatáshoz...</div>
+        </div>
+    </div>
+</div>
+
+<script type="module">
+    import {
+        caesarEncrypt,
+        caesarDecrypt,
+        groupReplaceEncrypt,
+        groupReplaceDecrypt,
+        viginereEncryption,
+        shannonKeveroTitkositas
+    } from './script.js';
+
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.querySelectorAll('.algo-panel').forEach(p => p.classList.remove('active'));
+            
+            btn.classList.add('active');
+            document.getElementById('panel-' + btn.dataset.tab).classList.add('active');
+        });
+    });
+
+    function displayResult(text, isError = false) {
+        const out = document.getElementById('output');
+        out.textContent = text;
+        out.classList.toggle('error', isError);
+    }
+
+    function handleCaesar(isDecrypt) {
+        try {
+            const str = document.getElementById('main-input').value;
+            const shift = parseInt(document.getElementById('caesar-shift').value, 10) || 0;
+            const withUnderLine = document.getElementById('caesar-underline').checked;
+            
+            const res = isDecrypt 
+                ? caesarDecrypt(str, shift, withUnderLine) 
+                : caesarEncrypt(str, shift, withUnderLine);
+            displayResult(res);
+        } catch (e) {
+            displayResult(e.message, true);
+        }
+    }
+    document.getElementById('btn-caesar-enc').addEventListener('click', () => handleCaesar(false));
+    document.getElementById('btn-caesar-dec').addEventListener('click', () => handleCaesar(true));
+
+    function handleGroup(isDecrypt) {
+        try {
+            const str = document.getElementById('main-input').value;
+            const matrixText = document.getElementById('group-matrix').value.trim();
+            const mtrx = matrixText.split('\n').map(row => row.split(',').map(cell => cell.trim().toUpperCase()));
+            const rowLabels = document.getElementById('group-rows').value.split(',').map(s => s.trim().toUpperCase());
+            const colLabels = document.getElementById('group-cols').value.split(',').map(s => s.trim().toUpperCase());
+
+            const res = isDecrypt
+                ? groupReplaceDecrypt(str, mtrx, rowLabels, colLabels)
+                : groupReplaceEncrypt(str, mtrx, rowLabels, colLabels);
+            displayResult(res);
+        } catch (e) {
+            displayResult(e.message, true);
+        }
+    }
+    document.getElementById('btn-group-enc').addEventListener('click', () => handleGroup(false));
+    document.getElementById('btn-group-dec').addEventListener('click', () => handleGroup(true));
+
+    function handleVigenere(isDecrypt) {
+        try {
+            const str = document.getElementById('main-input').value;
+            const key = document.getElementById('vig-key').value;
+            const customAbc = document.getElementById('vig-abc').value.toUpperCase();
+
+            const res = viginereEncryption(str, key, isDecrypt, customAbc);
+            displayResult(res);
+        } catch (e) {
+            displayResult(e.message, true);
+        }
+    }
+    document.getElementById('btn-vig-enc').addEventListener('click', () => handleVigenere(false));
+    document.getElementById('btn-vig-dec').addEventListener('click', () => handleVigenere(true));
+
+    // Shannon keverő esemény
+    document.getElementById('btn-shannon-enc').addEventListener('click', () => {
+        try {
+            const str = document.getElementById('main-input').value;
+            const shift = parseInt(document.getElementById('shannon-shift').value, 10) || 0;
+            const prePerm = document.getElementById('shannon-pre').value.split(',').map(n => parseInt(n.trim(), 10));
+            const afterPerm = document.getElementById('shannon-after').value.split(',').map(n => parseInt(n.trim(), 10));
+            const cycles = parseInt(document.getElementById('shannon-cycles').value, 10) || 1;
+            const spacer = document.getElementById('shannon-spacer').value || 'X';
+            const customAbc = document.getElementById('shannon-abc').value.toUpperCase();
+
+            const res = shannonKeveroTitkositas(str, shift, prePerm, afterPerm, cycles, spacer, customAbc);
+            displayResult(res);
+        } catch (e) {
+            displayResult(e.message, true);
+        }
+    });
+
+    const mainInput = document.getElementById('main-input');
+    const underlineCheckbox = document.getElementById('caesar-underline');
+
+    mainInput.addEventListener('input', () => {
+        if (mainInput.value.includes('_')) {
+            underlineCheckbox.checked = true;
+        }
+    });
+    document.getElementById('btn-copy').addEventListener('click', (e) => {
+        const text = document.getElementById('output').textContent;
+        navigator.clipboard.writeText(text).then(() => {
+            const btn = e.target;
+            const orig = btn.textContent;
+            btn.textContent = 'Másolva!';
+            setTimeout(() => btn.textContent = orig, 1500);
+        });
+    });
+</script>
+
+</body>
+</html>
